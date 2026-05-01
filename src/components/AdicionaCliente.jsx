@@ -1,91 +1,65 @@
 import React from "react";
-import { Form, Formik } from "formik";
+import { Formik, useField } from "formik";
+import * as yup from "yup";
+
+const Campo = (props) => {
+  const [field, meta] = useField(props);
+  return (
+    <div className="form-group">
+      <label htmlFor={props.id}>{props.label}</label>
+      <input
+        {...field}
+        {...props}
+        className={meta.error && meta.touched ? "is-invalid" : ""}
+      />
+      {meta.error && meta.touched ? (
+        <div className="invalid-feedback">{meta.error}</div>
+      ) : null}
+    </div>
+  );
+};
 
 const AdicionaCliente = () => {
+  const esquema = yup.object({
+    nome: yup
+      .string()
+      .required("O nome é obrigatório")
+      .min(10, "O nome deve ter pelo menos 10 caracteres")
+      .max(30, "O nome deve ter até 30 caracteres"),
+    email: yup
+      .string()
+      .required("O email é obrigatório")
+      .email("O email é inválido"),
+    nascimento: yup
+      .date()
+      .required("A data de nascimento é obrigatória")
+      .max(new Date(), "Data inválida"),
+  });
+
   return (
     <>
       <h1>Cadastro de Clientes</h1>
 
       <Formik
         initialValues={{ nome: "", email: "", nascimento: "" }}
-        validate={(values) => {
-          const errors = {};
-          if (!values.nome) {
-            errors.nome = "O nome é obrigatório";
-          }
-          if (!values.email) {
-            errors.email = "O email é obrigatório";
-          } else if (
-            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)
-          ) {
-            errors.email = "O email é inválido";
-          }
-          if (!values.nascimento) {
-            errors.nascimento = "A data de nascimento é obrigatória";
-          }
-          return errors;
-        }}
+        validationSchema={esquema}
         onSubmit={(values) => {
           alert(JSON.stringify(values));
         }}
       >
         {(props) => (
           <form onSubmit={props.handleSubmit} noValidate>
-            <div className="form-group">
-              <label htmlFor="nome">Nome</label>
-              <input
-                id="nome"
-                name="nome"
-                value={props.values.nome}
-                type="text"
-                onChange={props.handleChange}
-                onBlur={props.handleBlur}
-                className={
-                  props.errors.nome && props.touched.nome ? "is-invalid" : ""
-                }
-              />
-              {props.errors.nome && props.touched.nome ? (
-                <div className="invalid-feedback">{props.errors.nome}</div>
-              ) : null}
-            </div>
-            <div className="form-group">
-              <label htmlFor="email">Email</label>
-              <input
-                id="email"
-                name="email"
-                value={props.values.email}
-                type="email"
-                onChange={props.handleChange}
-                onBlur={props.handleBlur}
-                className={
-                  props.errors.email && props.touched.email ? "is-invalid" : ""
-                }
-              />
-              {props.errors.email && props.touched.email ? (
-                <div className="invalid-feedback">{props.errors.email}</div>
-              ) : null}
-            </div>
-            <div className="form-group">
-              <label htmlFor="date">Data de Nascimento</label>
-              <input
-                id="nascimento"
-                name="nascimento"
-                value={props.values.nascimento}
-                type="date"
-                onChange={props.handleChange}
-                onBlur={props.handleBlur}
-                className={
-                  props.errors.nascimento && props.touched.nascimento
-                    ? "is-invalid"
-                    : ""
-                }
-              />
-              {props.errors.nascimento && props.touched.nascimento ? (
-                <div className="invalid-feedback">
-                  {props.errors.nascimento}
-                </div>
-              ) : null}
-            </div>
+            <Campo id="nome" name="nome" type="text" label="Nome" />
+
+            <Campo id="email" name="email" type="email" label="Email" />
+
+            <Campo
+              id="nascimento"
+              name="nascimento"
+              type="date"
+              label="Data de Nascimento"
+            />
+
             <button type="submit">Adicionar</button>
           </form>
         )}

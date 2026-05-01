@@ -9,7 +9,8 @@
     "formik": "^2.4.9",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
+    "react-scripts": "3.4.1",
+    "yup": "^1.7.1"
   },
   "scripts": {
     "start": "react-scripts start",
